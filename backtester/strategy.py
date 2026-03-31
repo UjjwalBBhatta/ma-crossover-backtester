@@ -56,7 +56,11 @@ def backtest(df, initial_capital=100000):
     Returns:
         DataFrame with portfolio values
     """
-    pass
+    df = df.copy()
+    df["Returns"] = df["Close"].pct_change()
+    df["Strategy_Returns"] = df["Positions"].shift(1)*df["Returns"]
+    df["Portfolio"] = (1 + df["Strategy_Returns"]).cumprod() * initial_capital
+    return df 
 
 
 def calculate_metrics(df, initial_capital=100000):
@@ -71,3 +75,8 @@ def calculate_metrics(df, initial_capital=100000):
     """
     pass
 
+if __name__ == "__main__":
+    df = get_data("AAPL", "2020-01-01", "2024-01-01")
+    df = generate_signals(df)
+    df = backtest(df)
+    print(df[["Close", "MA_20", "MA_200", "Positions", "Signals", "Strategy_Returns", "Portfolio"]].tail(20))
