@@ -38,8 +38,12 @@ def generate_signals(df, short_window=20, long_window=200):
     Returns:
         DataFrame with signals added
     """
-    pass
-
+    df = df.copy()
+    df["MA_20"] = df["Close"].rolling(short_window).mean()
+    df["MA_200"] = df["Close"].rolling(long_window).mean()
+    df["Positions"] = (df["MA_20"]>df["MA_200"]).astype(int)
+    df["Signals"] = df["Positions"].diff()
+    return df
 
 def backtest(df, initial_capital=100000):
     """
@@ -67,7 +71,3 @@ def calculate_metrics(df, initial_capital=100000):
     """
     pass
 
-if __name__ == "__main__":
-    df = get_data("AAPL", "2020-01-01", "2024-01-01")
-    print(df.head())
-    print(df.columns)
