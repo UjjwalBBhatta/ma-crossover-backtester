@@ -73,10 +73,17 @@ def calculate_metrics(df, initial_capital=100000):
     Returns:
         dict of metrics
     """
-    pass
+    years = len(df) / 252
+    total_return = (df["Portfolio"].iloc[-1] - initial_capital) / initial_capital
+    
+    cagr = (df["Portfolio"].iloc[-1] / initial_capital) ** (1/years) - 1
+    sharpe = calculate_annual_sharpe(df["Strategy_Returns"].dropna())
+    max_dd = calculate_maxdd(df["Portfolio"])
+    
+    return {
+        "Total Return": f"{total_return*100:.2f}%",
+        "CAGR": f"{cagr*100:.2f}%",
+        "Sharpe Ratio": f"{sharpe:.2f}",
+        "Max Drawdown": f"{max_dd*100:.2f}%"
+    }
 
-if __name__ == "__main__":
-    df = get_data("AAPL", "2020-01-01", "2024-01-01")
-    df = generate_signals(df)
-    df = backtest(df)
-    print(df[["Close", "MA_20", "MA_200", "Positions", "Signals", "Strategy_Returns", "Portfolio"]].tail(20))
